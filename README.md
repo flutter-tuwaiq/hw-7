@@ -1,51 +1,49 @@
-## Assessment Description
+A server app built using [Shelf](https://pub.dev/packages/shelf),
+configured to enable running with [Docker](https://www.docker.com/).
 
-You have been tasked with creating a simple web API using Shelf and Dart. Your API should have the following features:
+This sample code handles HTTP GET requests to `/` and `/echo/<message>`
 
-### Multiple routes:
+# Running the sample
 
-Your API should have three unique URL endpoints, each handling a different HTTP method (GET, POST, DELETE, etc.). The routes should be organized based on user type. The required routes for each user type are as follows:
+## Running with the Dart SDK
 
-#### Student:
+You can run the example with the [Dart SDK](https://dart.dev/get-dart)
+like this:
 
-- Login (POST): Allow students to log in with their username and password.
-- Sign up (POST): Allow new students to create an account by submitting their name, email, username, and password.
-- Send post (POST): Allow students to create a new post by submitting a title and content.
+```
+$ dart run bin/server.dart
+Server listening on port 8080
+```
 
-#### Teacher:
+And then from a second terminal:
+```
+$ curl http://0.0.0.0:8080
+Hello, World!
+$ curl http://0.0.0.0:8080/echo/I_love_Dart
+I_love_Dart
+```
 
-- Login (POST): Allow teachers to log in with their username and password.
-- Sign up (POST): Allow new teachers to create an account by submitting their name, email, username, and password.
-- Send post (POST): Allow teachers to create a new post by submitting a title and content.
+## Running with Docker
 
-#### Boss:
+If you have [Docker Desktop](https://www.docker.com/get-started) installed, you
+can build and run with the `docker` command:
 
-- Login (POST): Allow bosses to log in with their username and password.
-- Sign up (POST): Allow new bosses to create an account by submitting their name, email, username, and password.
-- Send post (POST): Allow bosses to create a new post by submitting a title and content.
+```
+$ docker build . -t myserver
+$ docker run -it -p 8080:8080 myserver
+Server listening on port 8080
+```
 
-### Middleware:
+And then from a second terminal:
+```
+$ curl http://0.0.0.0:8080
+Hello, World!
+$ curl http://0.0.0.0:8080/echo/I_love_Dart
+I_love_Dart
+```
 
-You should use middlewares to perform common tasks such as logging and any other middleware. You should apply middlewares to at least one of your routes.
-
-### Error handling:
-
-You should handle errors gracefully and return appropriate error responses to clients. You should also log errors and debug your code effectively.
-
-## Evaluation Criteria
-
-Your project will be evaluated based on the following criteria:
-
-- Functionality: Does your API meet the requirements outlined in the assessment description?
-- Code Quality: Is your code clean, well-organized, and easy to understand? Do you follow best practices for Dart and Shelf?
-- Error Handling: Do you handle errors gracefully and return appropriate error responses to clients? Do you log errors and debug your code effectively?
-
-## Additional Notes
-
-1. You can use any additional packages or libraries that you think are necessary to complete the assessment.
-3. Your API should be able to handle requests and responses in JSON format.
-4. You should use hot reload to speed up your development process and improve your productivity.
-5. You should use Dart Code Metrics to analyze your code and improve its quality.
-
-## Deadline
-14/5/2023 10:00 AM
+You should see the logging printed in the first terminal:
+```
+2021-05-06T15:47:04.620417  0:00:00.000158 GET     [200] /
+2021-05-06T15:47:08.392928  0:00:00.001216 GET     [200] /echo/I_love_Dart
+```

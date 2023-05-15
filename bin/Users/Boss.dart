@@ -39,18 +39,25 @@ class Boss {
 
 //////////////////////////////////// Log in ////////////////////////////////////
 
-Middleware bossLogIn() => (innerHandler) => (Request req) {
-      final header = req.headers;
+Future<Response> bossLogIn(Request req) async {
+  try {
+    final body = await req.readAsString();
+    final Map jsonBody = json.decode(body);
 
-      if (header['Username'] == null) {
-        return Response.unauthorized('Please enter your Username');
-      }
-      if (header['Password'] == null) {
-        return Response.unauthorized('Please enter your Password');
-      }
+    if (!jsonBody.containsKey("Username")) {
+      return Response.badRequest(body: 'Please enter your Username');
+    }
+    if (!jsonBody.containsKey("Password")) {
+      return Response.badRequest(body: 'Please enter your Password');
+    }
 
-      return innerHandler(req);
-    };
+    return Response.ok('Welcome Boss');
+  } catch (error) {
+    print(error);
+  }
+
+  return Response.badRequest(body: 'Error');
+}
 
 /////////////////////////////////// Sign Up ////////////////////////////////////
 

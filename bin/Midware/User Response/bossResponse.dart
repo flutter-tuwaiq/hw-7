@@ -4,22 +4,24 @@ import 'dart:convert';
 import 'package:shelf/shelf.dart';
 import '../../server.dart';
 
-
 // Login Response: check if user have an account and return his info
 loginResponse(Request req) async {
-try {
+  try {
     final body = await req.readAsString();
     final Map jsonBody = json.decode(body);
-    Map user = students.firstWhere((user) =>
+    Map user = bosses.firstWhere((user) =>
         user["username"] == jsonBody["username"] &&
         user["password"] == jsonBody["password"]);
     if (user.isNotEmpty) {
-      return Response.ok(json.encode(user),
-          headers: {'Content-Type': 'Application/json'},);
+      return Response.ok(
+        json.encode(user),
+        headers: {'Content-Type': 'Application/json'},
+      );
     }
   } catch (error) {
     return Response.notFound('Unexpected error occured...');
-  }}
+  }
+}
 
 // Signup Response: check if all required data is recived and user is new
 signupResponse(Request req) async {
@@ -27,10 +29,7 @@ signupResponse(Request req) async {
     final body = await req.readAsString();
     final Map jsonBody = json.decode(body);
 
-    Map user = students.firstWhere((user) =>
-        user["username"] == jsonBody["username"] &&
-        user["password"] == jsonBody["password"]);
-
+    //check if keys exsistes
     if (!jsonBody.containsKey("username")) {
       if (!jsonBody.containsKey("password")) {
         if (!jsonBody.containsKey("name")) {
@@ -40,14 +39,24 @@ signupResponse(Request req) async {
         }
       }
     } else {
-      if (user["email"] == jsonBody["email"]) {
-        return Response.notFound('you already have an account');
-      } else if (user["username"] == jsonBody["username"]) {
-        return Response.notFound('this username is taken');
-      }
-      students.add(jsonBody);
+      if (bosses.isNotEmpty) {
+        Map user = students.firstWhere((user) =>
+            user["username"] == jsonBody["username"] &&
+            user["password"] == jsonBody["password"]);
+        //check if there is another account with the same username or email
+        if (user["email"] == jsonBody["email"]) {
+          return Response.notFound('you already have an account');
+        } else if (user["username"] == jsonBody["username"]) {
+          return Response.notFound('this username is taken');
+        }
+        bosses.add(jsonBody);
 
-      return Response.ok('signedup successfully...');
+        return Response.ok('signedup successfully...');
+      } else {
+        students.add(jsonBody);
+
+        return Response.ok('signedup successfully...');
+      }
     }
   } catch (error) {
     return Response.notFound('Unexpected error occured...');
@@ -60,6 +69,7 @@ sendpostResponse(Request req) async {
     final body = await req.readAsString();
     final Map jsonBody = json.decode(body);
 
+    //check if keys exsistes
     if (!jsonBody.containsKey("title")) {
       if (!jsonBody.containsKey("content")) {
         Response.notFound("Please fill the signup form");

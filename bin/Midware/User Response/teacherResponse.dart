@@ -29,10 +29,7 @@ signupResponse(Request req) async {
     final body = await req.readAsString();
     final Map jsonBody = json.decode(body);
 
-    Map user = students.firstWhere((user) =>
-        user["username"] == jsonBody["username"] &&
-        user["password"] == jsonBody["password"]);
-
+    //check if keys exsistes
     if (!jsonBody.containsKey("username")) {
       if (!jsonBody.containsKey("password")) {
         if (!jsonBody.containsKey("name")) {
@@ -42,14 +39,24 @@ signupResponse(Request req) async {
         }
       }
     } else {
-      if (user["email"] == jsonBody["email"]) {
-        return Response.notFound('you already have an account');
-      } else if (user["username"] == jsonBody["username"]) {
-        return Response.notFound('this username is taken');
-      }
-      students.add(jsonBody);
+      if (teachers.isNotEmpty) {
+        Map user = students.firstWhere((user) =>
+            user["username"] == jsonBody["username"] &&
+            user["password"] == jsonBody["password"]);
+        //check if there is another account with the same username or email
+        if (user["email"] == jsonBody["email"]) {
+          return Response.notFound('you already have an account');
+        } else if (user["username"] == jsonBody["username"]) {
+          return Response.notFound('this username is taken');
+        }
+        teachers.add(jsonBody);
 
-      return Response.ok('signedup successfully...');
+        return Response.ok('signedup successfully...');
+      } else {
+        teachers.add(jsonBody);
+
+        return Response.ok('signedup successfully...');
+      }
     }
   } catch (error) {
     return Response.notFound('Unexpected error occured...');
@@ -62,6 +69,7 @@ sendpostResponse(Request req) async {
     final body = await req.readAsString();
     final Map jsonBody = json.decode(body);
 
+    //check if keys exsistes
     if (!jsonBody.containsKey("title")) {
       if (!jsonBody.containsKey("content")) {
         Response.notFound("Please fill the signup form");

@@ -24,8 +24,8 @@ class Teacher {
   Handler get handler {
     final router = Router()
       ..post('/login', teacherLogIn)
-      ..post('/signup', teacherSignUp);
-    // ..post('/post', teacherPost);
+      ..post('/signup', teacherSignUp)
+      ..post('/post', teacherSendPost);
 
     final pipeline = Pipeline().addMiddleware(checkAuth()).addHandler(router);
 
@@ -61,23 +61,50 @@ Future<Response> teacherLogIn(Request req) async {
 
 /////////////////////////////////// Sign Up ////////////////////////////////////
 
-Middleware teacherSignUp() => (innerHandler) => (Request req) {
-      final header = req.headers;
+Future<Response> teacherSignUp(Request req) async {
+  try {
+    final body = await req.readAsString();
+    final Map jsonBody = json.decode(body);
 
-      if (header['Name'] == null) {
-        return Response.unauthorized('Please enter your Name');
-      }
-      if (header['Email'] == null) {
-        return Response.unauthorized('Please enter your Email');
-      }
-      if (header['Username'] == null) {
-        return Response.unauthorized('Please enter your Username');
-      }
-      if (header['Password'] == null) {
-        return Response.unauthorized('Please enter your Password');
-      }
+    if (!jsonBody.containsKey("Name")) {
+      return Response.badRequest(body: 'Please enter your Name');
+    }
+    if (!jsonBody.containsKey("Email")) {
+      return Response.badRequest(body: 'Please enter your Email');
+    }
+    if (!jsonBody.containsKey("Username")) {
+      return Response.badRequest(body: 'Please enter your Username');
+    }
+    if (!jsonBody.containsKey("Password")) {
+      return Response.badRequest(body: 'Please enter your Password');
+    }
 
-      return innerHandler(req);
-    };
+    return Response.ok('Welcome Teacher');
+  } catch (error) {
+    print(error);
+  }
+
+  return Response.badRequest(body: 'Error');
+}
 
 ////////////////////////////////// Send Post ///////////////////////////////////
+
+Future<Response> teacherSendPost(Request req) async {
+  try {
+    final body = await req.readAsString();
+    final Map jsonBody = json.decode(body);
+
+    if (!jsonBody.containsKey("Title")) {
+      return Response.badRequest(body: 'Please enter post title');
+    }
+    if (!jsonBody.containsKey("Content")) {
+      return Response.badRequest(body: 'Please enter post content');
+    }
+
+    return Response.ok('Your post is ready publish');
+  } catch (error) {
+    print(error);
+  }
+
+  return Response.badRequest(body: 'Error');
+}
